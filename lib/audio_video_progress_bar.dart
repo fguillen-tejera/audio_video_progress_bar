@@ -77,6 +77,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     Key? key,
     required this.progress,
     required this.total,
+    this.isPitch=false,
     this.buffered,
     this.onSeek,
     this.onDragStart,
@@ -111,7 +112,7 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// This is useful for streamed content. If you are playing a local file
   /// then you can leave this out.
   final Duration? buffered;
-
+  final bool isPitch;
   /// A callback when user moves the thumb.
   ///
   /// When the user moved the thumb on the progress bar this callback will
@@ -262,6 +263,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       total: total,
       buffered: buffered ?? Duration.zero,
       onSeek: onSeek,
+      isPitch:isPitch
       onDragStart: onDragStart,
       onDragUpdate: onDragUpdate,
       onDragEnd: onDragEnd,
@@ -404,6 +406,7 @@ class _EagerHorizontalDragGestureRecognizer
 
 class _RenderProgressBar extends RenderBox {
   _RenderProgressBar({
+    required bool isPitch,
     required Duration progress,
     required Duration total,
     required Duration buffered,
@@ -426,6 +429,7 @@ class _RenderProgressBar extends RenderBox {
     TextStyle? timeLabelTextStyle,
     double timeLabelPadding = 0.0,
   })  : _progress = progress,
+        _isPitch = isPitch,
         _total = total,
         _buffered = buffered,
         _onSeek = onSeek,
@@ -460,6 +464,7 @@ class _RenderProgressBar extends RenderBox {
   // This is a value between 0.0 and 1.0 used to indicate the position on
   // the bar.
   late double _thumbValue;
+  bool _isPitch = false;
 
   // The thumb can move for two reasons. One is that the [progress] changed.
   // The other is that the user is dragging the thumb. This variable keeps
@@ -591,7 +596,11 @@ class _RenderProgressBar extends RenderBox {
 
   TextPainter _layoutText(String text) {
     TextPainter textPainter = TextPainter(
-      text: TextSpan(text: text, style: _timeLabelTextStyle),
+      text: TextSpan(
+          text: text,
+          style: _timeLabelTextStyle?.copyWith(
+              color:
+                  _isPitch ? Colors.white : Color.fromARGB(255, 31, 31, 31))),
       textDirection: TextDirection.ltr,
     );
     textPainter.layout(minWidth: 0, maxWidth: double.infinity);
